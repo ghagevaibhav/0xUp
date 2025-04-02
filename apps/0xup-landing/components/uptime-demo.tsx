@@ -4,7 +4,6 @@ import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { CheckCircle, AlertCircle, Clock } from "lucide-react"
-import { interval } from "date-fns"
 
 export default function UptimeDemo() {
   const [currentTime, setCurrentTime] = useState(new Date())
@@ -37,7 +36,7 @@ export default function UptimeDemo() {
 
         setStatuses(newStatuses)
       }
-    }, 1000)
+    }, 3000)
 
     return () => clearInterval(interval)
   }, [statuses])
@@ -51,7 +50,7 @@ export default function UptimeDemo() {
               <CardTitle className="text-xl">0xUp Status Dashboard</CardTitle>
               <div className="flex items-center text-sm text-muted-foreground">
                 <Clock className="h-4 w-4 mr-2" />
-                <span suppressHydrationWarning>{currentTime.toLocaleTimeString()}</span>
+                <span>Last updated: {currentTime.toLocaleTimeString()}</span>
               </div>
             </div>
           </CardHeader>

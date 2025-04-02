@@ -3,7 +3,7 @@
 import axios from "axios"
 import { useEffect, useState } from "react"
 import { useAuth } from "@clerk/nextjs"
-import { API_BACKEND_URL } from "@/config"
+import { API_BACKEND_URL } from "@/config/config"
 
 interface Website {
   id: string

@@ -4,11 +4,11 @@ import { useState } from "react"
 import { useWebsitesContext } from "@/context/websites-context"
 import { WebsiteCard } from "@/components/website-card"
 import { WebsiteCardSkeleton } from "@/components/website-card-skeleton"
-import { AddWebsiteModal, AddWebsiteButton } from "@/components/add-website-modal"
+import { AddWebsiteModal } from "@/components/add-website-modal"
+import { ThemeToggle } from "@/components/theme-toggle"
 import { Button } from "@/components/ui/button"
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
-import { RefreshCw, Search, SlidersHorizontal, ArrowUpDown } from "lucide-react"
+import { RefreshCw, Search, SlidersHorizontal, ArrowUpDown, PlusCircle } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,16 +24,25 @@ export function UptimeDashboard() {
   const { websites, isLoading, refreshWebsites } = useWebsitesContext()
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
-  const [timeFilter, setTimeFilter] = useState("24h")
   const [searchQuery, setSearchQuery] = useState("")
   const [sortBy, setSortBy] = useState("status")
+  const [statusFilter, setStatusFilter] = useState("all")
 
-  // Filter websites based on search query
+  // Filter websites based on search query and status filter
   const filteredWebsites = websites.filter((website) => {
-    if (!searchQuery) return true
+    // Search filter
+    const matchesSearch =
+      !searchQuery ||
+      website.url.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      new URL(website.url).hostname.toLowerCase().includes(searchQuery.toLowerCase())
 
-    const query = searchQuery.toLowerCase()
-    return website.url.toLowerCase().includes(query) || new URL(website.url).hostname.toLowerCase().includes(query)
+    // Status filter
+    if (statusFilter === "all") return matchesSearch
+
+    const uptime = calculateUptimePercentage(website.ticks)
+    const status = getStatusFromUptime(uptime)
+
+    return matchesSearch && status === statusFilter
   })
 
   // Sort websites
@@ -45,8 +54,6 @@ export function UptimeDashboard() {
         return new URL(a.url).hostname.localeCompare(new URL(b.url).hostname)
       case "uptime":
         return calculateUptimePercentage(b.ticks) - calculateUptimePercentage(a.ticks)
-      case "response":
-        return calculateAverageResponseTime(a.ticks) - calculateAverageResponseTime(b.ticks)
       default:
         return 0
     }
@@ -64,14 +71,6 @@ export function UptimeDashboard() {
     // In a real app, this would call an API to add the website
     console.log("Adding website:", values)
     await new Promise((resolve) => setTimeout(resolve, 1000))
-    await refreshWebsites()
-  }
-
-  // Handle refresh single website
-  const handleRefreshWebsite = async (id: string) => {
-    // In a real app, this would call an API to refresh a specific website
-    console.log("Refreshing website:", id)
-    await new Promise((resolve) => setTimeout(resolve, 800))
     await refreshWebsites()
   }
 
@@ -99,14 +98,6 @@ export function UptimeDashboard() {
         </div>
 
         <div className="flex flex-wrap gap-2 items-center">
-          {/* <Tabs value={timeFilter} onValueChange={setTimeFilter} className="w-auto">
-            <TabsList className="grid grid-cols-3 w-[240px]">
-              <TabsTrigger value="1h">Last Hour</TabsTrigger>
-              <TabsTrigger value="24h">24 Hours</TabsTrigger>
-              <TabsTrigger value="7d">7 Days</TabsTrigger>
-            </TabsList>
-          </Tabs> */}
-
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="icon" aria-label="Sort websites">
@@ -120,7 +111,6 @@ export function UptimeDashboard() {
                 <DropdownMenuRadioItem value="status">Status</DropdownMenuRadioItem>
                 <DropdownMenuRadioItem value="name">Name</DropdownMenuRadioItem>
                 <DropdownMenuRadioItem value="uptime">Uptime</DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="response">Response Time</DropdownMenuRadioItem>
               </DropdownMenuRadioGroup>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -134,7 +124,7 @@ export function UptimeDashboard() {
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Filter by</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuRadioGroup value="all">
+              <DropdownMenuRadioGroup value={statusFilter} onValueChange={setStatusFilter}>
                 <DropdownMenuRadioItem value="all">All Websites</DropdownMenuRadioItem>
                 <DropdownMenuRadioItem value="online">Online</DropdownMenuRadioItem>
                 <DropdownMenuRadioItem value="degraded">Degraded</DropdownMenuRadioItem>
@@ -148,13 +138,16 @@ export function UptimeDashboard() {
             {isRefreshing ? "Refreshing..." : "Refresh All"}
           </Button>
 
-          <AddWebsiteButton onClick={() => setIsAddModalOpen(true)} />
+          <Button onClick={() => setIsAddModalOpen(true)} className="gap-2">
+            <PlusCircle className="h-4 w-4" />
+            Add Website
+          </Button>
         </div>
       </div>
 
       {/* Website Grid */}
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="space-y-2">
           {Array(6)
             .fill(0)
             .map((_, i) => (
@@ -168,16 +161,18 @@ export function UptimeDashboard() {
           </div>
           <h3 className="text-xl font-medium mb-2">No websites found</h3>
           <p className="text-muted-foreground mb-6 max-w-md">
-            {searchQuery
-              ? "No websites match your search criteria. Try a different search term."
+            {searchQuery || statusFilter !== "all"
+              ? "No websites match your search criteria. Try different filters."
               : "You haven't added any websites to monitor yet. Add your first website to get started."}
           </p>
-          {!searchQuery && <Button onClick={() => setIsAddModalOpen(true)}>Add Your First Website</Button>}
+          {!searchQuery && statusFilter === "all" && (
+            <Button onClick={() => setIsAddModalOpen(true)}>Add Your First Website</Button>
+          )}
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="space-y-2">
           {sortedWebsites.map((website) => (
-            <WebsiteCard key={website.id} website={website} onRefresh={handleRefreshWebsite} />
+            <WebsiteCard key={website.id} website={website} />
           ))}
         </div>
       )}
@@ -203,13 +198,9 @@ function calculateUptimePercentage(ticks: any[]): number {
   return (upTicks / ticks.length) * 100
 }
 
-function calculateAverageResponseTime(ticks: any[]): number {
-  if (ticks.length === 0) return 0
-
-  const validTicks = ticks.filter((tick) => tick.latency)
-  if (validTicks.length === 0) return 0
-
-  const sum = validTicks.reduce((acc, tick) => acc + tick.latency, 0)
-  return Math.round(sum / validTicks.length)
+function getStatusFromUptime(uptime: number): "online" | "degraded" | "offline" {
+  if (uptime >= 99) return "online"
+  if (uptime >= 95) return "degraded"
+  return "offline"
 }
 
