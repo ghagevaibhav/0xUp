@@ -7,10 +7,10 @@ async function seed () {
         }
     })
 
-    await prisma.website.create({
+    const website = await prisma.website.create({
         data: {
             // id: "1",
-            url: "https://www.0xup.com",
+            url: "https://www.0xup2.com",
             userId: "1" 
         }
     }) 
@@ -18,7 +18,7 @@ async function seed () {
     const validator = await prisma.validator.create({
         data: {
             // id: "1",
-            sol_address: "1",
+            publicKey: "1",
             location: "Pune",
             ip: "127.0.0.1 ",
         }
@@ -27,7 +27,7 @@ async function seed () {
     await prisma.websiteTick.create({
         data: {
             // id: "1",
-            websiteId: "1",
+            websiteId: website.id,
             validatorId: validator.id,
             createdAt:  new Date(),
             status: "Up",
@@ -38,7 +38,7 @@ async function seed () {
     await prisma.websiteTick.create({
         data: {
             // id: "1",
-            websiteId: "1",
+            websiteId: website.id,
             validatorId: validator.id,
             createdAt:  new Date(Date.now() - 3 * 60 * 1000),
             status: "Down",
@@ -49,7 +49,7 @@ async function seed () {
     await prisma.websiteTick.create({
         data: {
             // id: "1",
-            websiteId: "1",
+            websiteId: website.id,
             validatorId: validator.id,
             createdAt:  new Date(Date.now() - 6 * 60 * 1000),
             status: "Up",
