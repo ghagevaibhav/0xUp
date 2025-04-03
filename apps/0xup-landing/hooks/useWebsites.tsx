@@ -1,49 +1,103 @@
 "use client"
 
 import axios from "axios"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { useAuth } from "@clerk/nextjs"
 import { API_BACKEND_URL } from "@/config/config"
+import { Tick, Website } from "@/types/website"
 
-interface Website {
+interface ApiTick {
+  id: string
+  websiteId: string
+  validatorId: string
+  createdAt: Date
+  status: "Up" | "Down"
+  latency: number
+}
+
+interface ApiWebsite {
   id: string
   url: string
-  ticks: {
-    id: string
-    websiteId: string
-    validatorId: string
-    createdAt: Date
-    status: "Up" | "Down"
-    latency: number
-  }[]
+  disabled: boolean
+  userId: string
+  validatorsStaked?: number
+  ticks: ApiTick[]
 }
 
-export default function useWebsites() {
+interface ApiResponse {
+  websites: ApiWebsite[]
+}
+
+export default function useWebsites(pollInterval?: number) {
   const { getToken } = useAuth()
   const [websites, setWebsites] = useState<Website[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<Error | null>(null)
 
-  async function refreshWebsites() {
-    const token = await getToken()
-    const response = await axios.get(`${API_BACKEND_URL}/api/v1/websites`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-    setWebsites(response.data.websites)
-  }
+  const refreshWebsites = useCallback(async () => {
+    setIsLoading(true)
+    setError(null)
+    try {
+      const token = await getToken()
+      const response = await axios.get<ApiResponse>(`${API_BACKEND_URL}/api/v1/websites`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      
+      const websites = response.data.websites.map((website: ApiWebsite) => ({
+        ...website,
+        ticks: website.ticks.map((tick: ApiTick) => ({
+          ...tick,
+          createdAt: new Date(tick.createdAt)
+        }))
+      }))
+
+      setWebsites(websites)
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error('Failed to fetch websites'))
+      console.error("Failed to fetch websites:", err)
+    } finally {
+      setIsLoading(false)
+    }
+  }, [getToken])
 
   useEffect(() => {
-    refreshWebsites()
+    const abortController = new AbortController()
 
-    const interval = setInterval(
-      () => {
-        refreshWebsites()
-      },
-      1000 * 60 * 15,
-    )
-    return () => clearInterval(interval)
-  }, [])
+    const fetchData = async () => {
+      try {
+        const token = await getToken()
+        const response = await axios.get<ApiResponse>(`${API_BACKEND_URL}/api/v1/websites`, {
+          headers: { Authorization: `Bearer ${token}` },
+          signal: abortController.signal
+        })
+        
+        const websites = response.data.websites.map((website: ApiWebsite) => ({
+          ...website,
+          ticks: website.ticks.map((tick: ApiTick) => ({
+            ...tick,
+            createdAt: new Date(tick.createdAt)
+          }))
+        }))
 
-  return { websites, refreshWebsites }
+        setWebsites(websites)
+      } catch (err) {
+        if (!abortController.signal.aborted) {
+          setError(err instanceof Error ? err : new Error('Failed to fetch websites'))
+          console.error("Failed to fetch websites:", err)
+        }
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchData()
+    const interval = setInterval(fetchData, pollInterval)
+    
+    return () => {
+      abortController.abort()
+      clearInterval(interval)
+    }
+  }, [getToken, pollInterval])
+
+  return { websites, refreshWebsites, isLoading, error }
 }
-

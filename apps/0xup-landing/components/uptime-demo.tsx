@@ -50,7 +50,7 @@ export default function UptimeDemo() {
               <CardTitle className="text-xl">0xUp Status Dashboard</CardTitle>
               <div className="flex items-center text-sm text-muted-foreground">
                 <Clock className="h-4 w-4 mr-2" />
-                <span>Last updated: {currentTime.toLocaleTimeString()}</span>
+                <span suppressHydrationWarning>Last updated: {currentTime.toLocaleTimeString()}</span>
               </div>
             </div>
           </CardHeader>

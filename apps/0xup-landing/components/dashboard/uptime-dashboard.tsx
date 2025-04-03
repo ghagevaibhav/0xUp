@@ -19,6 +19,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import type { Website } from "@/types/website"
+import { API_BACKEND_URL } from "@/config/config"
+import axios from "axios"
+import { useAuth } from "@clerk/nextjs"
 
 export function UptimeDashboard() {
   const { websites, isLoading, refreshWebsites } = useWebsitesContext()
@@ -27,6 +30,7 @@ export function UptimeDashboard() {
   const [searchQuery, setSearchQuery] = useState("")
   const [sortBy, setSortBy] = useState("status")
   const [statusFilter, setStatusFilter] = useState("all")
+  const { getToken } = useAuth();
 
   // Filter websites based on search query and status filter
   const filteredWebsites = websites.filter((website) => {
@@ -68,10 +72,19 @@ export function UptimeDashboard() {
 
   // Handle add website
   const handleAddWebsite = async (values: { name: string; url: string }) => {
-    // In a real app, this would call an API to add the website
-    console.log("Adding website:", values)
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    await refreshWebsites()
+    try {
+      const token = await getToken();
+      await axios.post(`${API_BACKEND_URL}/api/v1/website`, values, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        }
+      });
+      await refreshWebsites();
+    } catch (err) {
+      // setIsRefreshing(false) 
+      console.error("Failed to add website:", err);
+      // toast for user feedback 
+    }
   }
 
   return (

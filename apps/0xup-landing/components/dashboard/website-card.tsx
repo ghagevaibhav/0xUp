@@ -96,14 +96,14 @@ export default function WebsiteCard({ website }: WebsiteCardProps) {
                       <div
                         className={`
                           h-full w-2 rounded-sm transition-all duration-300
-                          ${tick.status === "up" ? "bg-green-500" : "bg-red-500"}
+                          ${tick.status === "Up" ? "bg-green-500" : "bg-red-500"}
                           hover:w-3 hover:shadow-[0_0_8px_rgba(var(--primary),0.5)]
                         `}
                       ></div>
                     </TooltipTrigger>
                     <TooltipContent side="top" className="text-xs">
                       <p>{new Date(tick.createdAt).toLocaleString()}</p>
-                      <p>Status: {tick.status === "up" ? "Online" : "Offline"}</p>
+                      <p>Status: {tick.status === "Up" ? "Online" : "Offline"}</p>
                       <p>Latency: {tick.latency}ms</p>
                     </TooltipContent>
                   </Tooltip>
@@ -152,7 +152,7 @@ export default function WebsiteCard({ website }: WebsiteCardProps) {
                   <div key={index} className="flex justify-between items-center text-sm py-1 border-b border-muted/50">
                     <div className="flex items-center gap-2">
                       <div
-                        className={`h-2 w-2 rounded-full ${tick.status === "up" ? "bg-green-500" : "bg-red-500"}`}
+                        className={`h-2 w-2 rounded-full ${tick.status === "Up" ? "bg-green-500" : "bg-red-500"}`}
                       ></div>
                       <span>{new Date(tick.createdAt).toLocaleString()}</span>
                     </div>
@@ -160,8 +160,8 @@ export default function WebsiteCard({ website }: WebsiteCardProps) {
                       <span className="text-muted-foreground">
                         Latency: <span className="font-medium">{tick.latency}ms</span>
                       </span>
-                      <Badge variant="outline" className={tick.status === "up" ? "text-green-500" : "text-red-500"}>
-                        {tick.status === "up" ? "Online" : "Offline"}
+                      <Badge variant="outline" className={tick.status === "Up" ? "text-green-500" : "text-red-500"}>
+                        {tick.status === "Up" ? "Online" : "Offline"}
                       </Badge>
                     </div>
                   </div>

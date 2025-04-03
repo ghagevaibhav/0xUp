@@ -74,13 +74,13 @@ export function WebsiteCard({ website, className }: WebsiteCardProps) {
           <div className="mt-4 pt-4 border-t animate-slide-up">
             <div className="space-y-2">
               <div className="flex flex-col gap-1">
-                <p className="text-xs text-muted-foreground">Last 30 minutes status:</p>
+                <p className="text-xs text-muted-foreground mb-2">Last 30 minutes status:</p>
                 <div className="flex gap-1 h-2">
                   {recentTicks.map((tick, index) => (
                     <div
                       key={index}
-                      className={cn("h-full flex-1 rounded-sm", tick.status === "up" ? "bg-green-500" : "bg-red-500")}
-                      title={`${new Date(tick.createdAt).toLocaleTimeString()}: ${tick.status === "up" ? "Online" : "Offline"}`}
+                      className={cn("h-full flex-1 rounded-sm", tick.status === "Up" ? "bg-green-500" : "bg-red-500")}
+                      title={`${new Date(tick.createdAt).toLocaleTimeString()}: ${tick.status === "Up" ? "Online" : "Offline"}`}
                     />
                   ))}
 
@@ -88,7 +88,7 @@ export function WebsiteCard({ website, className }: WebsiteCardProps) {
                   {Array(10 - recentTicks.length)
                     .fill(0)
                     .map((_, index) => (
-                      <div key={`empty-${index}`} className="h-full flex-1 rounded-sm bg-muted/50" />
+                      <div key={`empty-${index}`} className="h-full flex-1 rounded-sm bg-gray-500" />
                     ))}
                 </div>
               </div>
@@ -106,7 +106,7 @@ export function WebsiteCard({ website, className }: WebsiteCardProps) {
 function calculateUptimePercentage(ticks: any[]): number {
   if (ticks.length === 0) return 100
 
-  const upTicks = ticks.filter((tick) => tick.status === "up").length
+  const upTicks = ticks.filter((tick) => tick.status === "Up").length
   return (upTicks / ticks.length) * 100
 }
 

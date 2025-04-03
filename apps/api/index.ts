@@ -1,15 +1,20 @@
-import express from "express";
+import 'dotenv/config' 
+import express, { type Request, type Response } from "express";
 import { prisma } from "db/client";
 import { authMiddleware } from "./middleware";
 import cors from "cors";
-
+import { ClerkExpressRequireAuth, ClerkExpressWithAuth } from '@clerk/clerk-sdk-node'
 const app = express();
 
 app.use(express.json());
 app.use(cors());
 app.use(authMiddleware);
 
-app.post("/api/v1/website", async (req, res) => {
+interface Error {
+    stack: string;
+}
+
+app.post("/api/v1/website", ClerkExpressRequireAuth(), async (req, res) => {
   const userId = req.userId!;
   const { url } = req.body;
 
@@ -72,6 +77,11 @@ app.delete("/api/v1/website", async (req, res) => {
 
   res.json(data);
 });
+
+app.use((err: Error, req: Request, res: Response) => {
+    console.error(err.stack)
+    res.status(401).send('Unauthenticated!')
+  })
 
 app.listen(8080, () => {
   console.log("Server started on port 8080");

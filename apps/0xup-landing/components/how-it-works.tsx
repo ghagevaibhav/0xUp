@@ -1,6 +1,5 @@
 import { ArrowRight, PlusCircle, Network, Bell } from "lucide-react"
 import Image from 'next/image';
-import { Architecture } from "./archiecture";
 
 export default function HowItWorks() {
   return (
@@ -73,11 +72,16 @@ export default function HowItWorks() {
             </p>
           </div>
           <div className="bg-muted p-8 flex justify-center">
-            <div className="relative h-[400px] w-full max-w-4xl">
-              <Image src="/image.png" alt="System Architecture" layout="fill" objectFit="cover" />
-              {/* <Architecture /> */}
-            </div>
-          </div>
+          <div className="relative w-full aspect-video max-w-4xl mx-auto bg-gray-50">
+  <Image
+    src="/image.png"
+    alt="System Architecture"
+    fill
+    className="object-contain"  // Ensures full visibility
+    priority
+  />
+</div>
+</div>
         </div>
       </div>
     </section>

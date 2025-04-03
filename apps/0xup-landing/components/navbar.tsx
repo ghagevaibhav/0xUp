@@ -28,27 +28,29 @@ export default function Navbar() {
         isScrolled ? "bg-background/80 backdrop-blur-md border-b" : "bg-transparent"
       }`}
     >
-      <div className="container flex h-16 items-center justify-between">
-        <div className="flex items-center gap-6">
+      <div className="container flex h-16 items-center">
+        <div className="flex-1">
           <Logo />
-          <nav className="hidden md:flex gap-6 ">
-            <Link href="#features" className="text-sm font-medium hover:text-primary">
-              Features
-            </Link>
-            <Link href="#how-it-works" className="text-sm font-medium hover:text-primary">
-              How It Works
-            </Link>
-            <Link href="/dashboard" className="text-sm font-medium hover:text-primary">
-              Dashboard
-            </Link>
-            <Link href="#" className="text-sm font-medium hover:text-primary">
-              Docs
-            </Link>
-          </nav>
         </div>
-        <div className="hidden md:flex items-center gap-4">
-          <ThemeToggle />
-          <div className="text-sm font-medium hover:text-primary">
+
+        <nav className="hidden md:flex items-center justify-center gap-6 flex-1">
+          <Link href="#features" className="text-sm font-medium hover:text-primary">
+            Features
+          </Link>
+          <Link href="#how-it-works" className="text-sm font-medium hover:text-primary">
+            How It Works
+          </Link>
+          <Link href="/dashboard" className="text-sm font-medium hover:text-primary">
+            Dashboard
+          </Link>
+          <Link href="#" className="text-sm font-medium hover:text-primary">
+            Docs
+          </Link>
+        </nav>
+
+        <div className="flex-1 flex items-center justify-end gap-4">
+        <ThemeToggle />
+          <div className="text-sm pr-4 font-medium hover:text-primary">
             <SignInButton >
               <UserButton />
             </SignInButton>
@@ -56,16 +58,9 @@ export default function Navbar() {
               <SignInButton />
             </SignedOut>
           </div>
-
-          {/* <ConnectWallet /> */}
-        </div>
-        <div className="md:hidden flex items-center gap-4">
-          <ModeToggle />
-          <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(!isMenuOpen)} aria-label="Toggle menu">
-            {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </Button>
         </div>
       </div>
+
       {isMenuOpen && (
         <div className="md:hidden container py-4 bg-background border-b">
           <nav className="flex flex-col gap-4">
