@@ -143,7 +143,7 @@ setInterval(async () => {
         availableValidators.forEach((validator) => {
             const callbackId = randomUUIDv7();
             console.log(
-                `Sending validate req to ${validator.validatorId} id for ${website.url}`
+                `Sending validate to ${validator.validatorId} ${website.url}`
             );
             validator.socket.send(
                 JSON.stringify({

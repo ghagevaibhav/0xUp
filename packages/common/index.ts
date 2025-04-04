@@ -1,27 +1,27 @@
 
 
-interface SignupIncomingMessage {
+interface SignupIncomingMessage { // validator sending req to hub
     ip: string
     publicKey:string
     signedMessage: string
     callbackId: string
 }
 
-interface ValidateIncomingMessage {
+interface ValidateIncomingMessage { // validator sending validated data / response to hub
     callbackId: string
     signedMessage: string
     status: "Up" | "Down"
     latency: number
     websiteId: string
     validatorId: string
-}
+}       
 
-interface SignupOutgoingMessage {
+interface SignupOutgoingMessage { // hub sending response to validator
     callbackId: string
     validatorId: string
 }
 
-interface ValidateOutgoingMessage {
+interface ValidateOutgoingMessage {  // hub sending req to validator
     callbackId: string
     url: string
     websiteId: string                   
