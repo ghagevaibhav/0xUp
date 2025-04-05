@@ -1,9 +1,11 @@
+// import { Keypair } from "@solana/web3.js";
+// import bs58 from 'bs58';
 import type { IncomingMessage, SignupIncomingMessage } from "common";
 import { prisma } from "db/client";
 import { randomUUIDv7, type ServerWebSocket } from "bun";
 import { PublicKey } from "@solana/web3.js";
 import nacl from "tweetnacl";
-import nacl_util, { decodeUTF8 } from "tweetnacl-util";
+import nacl_util from "tweetnacl-util";
 
 const CALLBACKS: { [callbackId: string]: (data: IncomingMessage) => void } = {};
 const COST_PER_VALIDATION = 100; // in lamports
@@ -30,13 +32,18 @@ Bun.serve({
             if (data.type === "signup") {
                 const verified = await verifyMessage(
                     `Signed message for ${data.data.callbackId}, ${data.data.publicKey}`,
-                    data.data.signedMessage,
-                    data.data.publicKey
+                    data.data.publicKey,
+                    data.data.signedMessage
                 );
                 if (verified) {
                     await signupHandler(ws, data.data);
                 }
-            } else if (data.type === "validate") {
+            }
+            // callback function to call when
+            // validator returns the data on 
+            // status and latency and the callback 
+            // function stores it in db 
+            else if (data.type === "validate") {
                 CALLBACKS[data.data.callbackId](data);
                 delete CALLBACKS[data.data.callbackId];
             }
@@ -68,8 +75,8 @@ async function signupHandler(
             JSON.stringify({
                 type: "signup",
                 data: {
-                    callbackId,
                     validatorId: validatorDb.id,
+                    callbackId,
                 },
             })
         );
@@ -97,7 +104,7 @@ async function signupHandler(
         data: {
             ip,
             publicKey,
-            location: location.city,
+            location: "Pune"
         },
     });
 
@@ -118,6 +125,7 @@ async function signupHandler(
     });
 }
 
+// to verify if signature is coming from validator or not 
 async function verifyMessage(
     message: string,
     signature: string,
@@ -132,6 +140,7 @@ async function verifyMessage(
     return result;
 }
 
+// distibuting load / url to validators every minute and storing the response in db 
 setInterval(async () => {
     const websiteToMonitor = await prisma.website.findMany({
         where: {
@@ -155,6 +164,7 @@ setInterval(async () => {
                 })
             );
 
+            // callback function to call when the validator returns the data (status, latency)
             CALLBACKS[callbackId] = async (data: IncomingMessage) => {
                 if (data.type === "validate") {
                     const { validatorId, status, latency, signedMessage } = data.data;
@@ -194,4 +204,13 @@ setInterval(async () => {
             };
         });
     }
+    console.log()
 }, 60 * 1000);
+
+// function pvkey() {
+    
+//     let secretKey = bs58.decode("");
+//     console.log(`[${Keypair.fromSecretKey(secretKey).secretKey}]`);
+// }
+
+// pvkey();

@@ -12,6 +12,7 @@
     "@solana/web3.js": "^1.98.0",
     "common": "*",
     "db": "*",
+    "dotenv": "^16.4.7",
     "tweetnacl": "^1.0.3",
     "tweetnacl-util": "^0.15.1",
     "ws": "^8.18.1"

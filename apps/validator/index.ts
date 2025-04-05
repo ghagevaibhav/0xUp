@@ -3,6 +3,9 @@ import { randomUUIDv7 } from "bun";
 import type { OutgoingMessage, SignupOutgoingMessage, ValidateOutgoingMessage } from "common";
 import nacl from "tweetnacl";
 import nacl_util from 'tweetnacl-util';
+import dotenv from 'dotenv';
+dotenv.config();
+
 
 const CALLBACKS: { [callbackId: string]: (data: SignupOutgoingMessage) => void } = {}
 
@@ -98,6 +101,8 @@ async function signMessage(message: string, keyPair: Keypair) {
     return JSON.stringify(Array.from(signature));
 }
 
+main();
+
 setInterval( async () => {
-    
+    console.log('started again')
 }, 10000);
