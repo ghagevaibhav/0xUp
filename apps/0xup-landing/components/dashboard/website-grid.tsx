@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { WebsiteCardSkeleton } from "@/components/dashboard/website-card-skeleton"
 
 export default function WebsiteGrid() {
-  const { websites, isLoading } = useWebsitesContext()
+  const { websites } = useWebsitesContext()
 
   if (isLoading) {
     return (

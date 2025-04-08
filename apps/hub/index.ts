@@ -1,5 +1,5 @@
-// import { Keypair } from "@solana/web3.js";
-// import bs58 from 'bs58';
+import { Keypair } from "@solana/web3.js";
+import bs58 from "bs58";
 import type { IncomingMessage, SignupIncomingMessage } from "common";
 import { prisma } from "db/client";
 import { randomUUIDv7, type ServerWebSocket } from "bun";
@@ -12,8 +12,8 @@ const COST_PER_VALIDATION = 100; // in lamports
 
 const availableValidators: {
     validatorId: string;
-    publicKey: string;
     socket: ServerWebSocket<unknown>;
+    publicKey: string;
 }[] = [];
 
 // http server
@@ -40,9 +40,9 @@ Bun.serve({
                 }
             }
             // callback function to call when
-            // validator returns the data on 
-            // status and latency and the callback 
-            // function stores it in db 
+            // validator returns the data on
+            // status and latency and the callback
+            // function stores it in db
             else if (data.type === "validate") {
                 CALLBACKS[data.data.callbackId](data);
                 delete CALLBACKS[data.data.callbackId];
@@ -90,7 +90,8 @@ async function signupHandler(
         return;
     }
 
-    // else if first time signup then create db entry and send back message and push to available validators array
+    // else if first time signup then create db entry and send
+    //  back message and push to available validators array
 
     // find location through ip
     const response = await fetch(`http://ip-api.com/json/${ip}`);
@@ -104,7 +105,7 @@ async function signupHandler(
         data: {
             ip,
             publicKey,
-            location: "Pune"
+            location: "Pune",
         },
     });
 
@@ -125,22 +126,28 @@ async function signupHandler(
     });
 }
 
-// to verify if signature is coming from validator or not 
+// to verify if signature is coming from validator or not
 async function verifyMessage(
     message: string,
-    signature: string,
-    publicKey: string
+    publicKey: string,
+    signature: string
 ) {
-    const messageBytes = nacl_util.decodeUTF8(message);
-    const result = nacl.sign.detached.verify(
-        messageBytes,
-        new Uint8Array(JSON.parse(signature)),
-        new PublicKey(publicKey).toBytes()
-    );
-    return result;
+    try {
+        const messageBytes = nacl_util.decodeUTF8(message);
+        const result = nacl.sign.detached.verify(
+            messageBytes,
+            new Uint8Array(JSON.parse(signature)),
+            new PublicKey(publicKey).toBytes()
+        );
+
+        return result;
+    } catch (error) {
+        console.error("Signature verification failed:", error);
+        return false;
+    }
 }
 
-// distibuting load / url to validators every minute and storing the response in db 
+// distibuting load / url to validators every minute and storing the response in db
 setInterval(async () => {
     const websiteToMonitor = await prisma.website.findMany({
         where: {
@@ -168,6 +175,13 @@ setInterval(async () => {
             CALLBACKS[callbackId] = async (data: IncomingMessage) => {
                 if (data.type === "validate") {
                     const { validatorId, status, latency, signedMessage } = data.data;
+
+                    const validator = await prisma.validator.findUnique({
+                        where: { id: validatorId },
+                    });
+
+                    if (!validator) return;
+
                     const verified = await verifyMessage(
                         `Replying to ${callbackId}`,
                         validator.publicKey,
@@ -204,13 +218,5 @@ setInterval(async () => {
             };
         });
     }
-    console.log()
-}, 60 * 1000);
-
-// function pvkey() {
-    
-//     let secretKey = bs58.decode("");
-//     console.log(`[${Keypair.fromSecretKey(secretKey).secretKey}]`);
-// }
-
-// pvkey();
+    console.log("started");
+}, 3 * 60 * 1000);

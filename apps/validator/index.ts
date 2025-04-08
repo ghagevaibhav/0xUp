@@ -1,11 +1,8 @@
-import { Keypair } from "@solana/web3.js";
 import { randomUUIDv7 } from "bun";
-import type { OutgoingMessage, SignupOutgoingMessage, ValidateOutgoingMessage } from "common";
+import { Keypair } from "@solana/web3.js";
 import nacl from "tweetnacl";
 import nacl_util from 'tweetnacl-util';
-import dotenv from 'dotenv';
-dotenv.config();
-
+import type { OutgoingMessage, SignupOutgoingMessage, ValidateOutgoingMessage } from "common";
 
 const CALLBACKS: { [callbackId: string]: (data: SignupOutgoingMessage) => void } = {}
 
@@ -83,7 +80,7 @@ async function validateHandler(ws: WebSocket, { url, callbackId, websiteId }: Va
             type: 'validate',
             data: {
                 callbackId,
-                status: 'Bad',
+                status: 'Down',
                 latency: 1000,
                 websiteId,
                 validatorId,
@@ -94,15 +91,15 @@ async function validateHandler(ws: WebSocket, { url, callbackId, websiteId }: Va
     }
 }
 
-
 async function signMessage(message: string, keyPair: Keypair) {
     const messageBytes = nacl_util.decodeUTF8(message);
     const signature = nacl.sign.detached(messageBytes, keyPair.secretKey);
+
     return JSON.stringify(Array.from(signature));
 }
 
 main();
 
-setInterval( async () => {
+setInterval(async () => {
     console.log('started again')
-}, 10000);
+}, 1000);

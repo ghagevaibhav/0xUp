@@ -19,14 +19,18 @@ export default function Footer() {
               always online.
             </p>
             <div className="flex items-center gap-4 mb-4">
-              <Button size="icon" variant="ghost">
-                <Twitter className="h-5 w-5" />
-                <span className="sr-only">Twitter</span>
-              </Button>
-              <Button size="icon" variant="ghost">
-                <Github className="h-5 w-5" />
-                <span className="sr-only">GitHub</span>
-              </Button>
+              <a href="https://x.com/0xghagevaibhav" target="_blank" rel="noopener noreferrer">
+                <Button size="icon" variant="ghost">
+                  <Twitter className="h-5 w-5" />
+                  <span className="sr-only">Twitter</span>
+                </Button>
+              </a>
+              <a href="https://github.com/ghagevaibhav/0xUp" target="_blank" rel="noopener noreferrer">
+                <Button size="icon" variant="ghost">
+                  <Github className="h-5 w-5"/>
+                  <span className="sr-only">GitHub</span>
+                </Button>
+              </a>
               <Button size="icon" variant="ghost">
                 <Discord className="h-5 w-5" />
                 <span className="sr-only">Discord</span>
@@ -45,7 +49,7 @@ export default function Footer() {
             <h3 className="font-medium text-lg mb-4">Product</h3>
             <ul className="space-y-3">
               <li>
-                <Link href="#" className="text-muted-foreground hover:text-foreground">
+                <Link href="#features" className="text-muted-foreground hover:text-foreground"> 
                   Features
                 </Link>
               </li>

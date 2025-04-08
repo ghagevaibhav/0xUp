@@ -3,7 +3,7 @@ import express, { type Request, type Response } from "express";
 import { prisma } from "db/client";
 import { authMiddleware } from "./middleware";
 import cors from "cors";
-import { ClerkExpressRequireAuth, ClerkExpressWithAuth } from '@clerk/clerk-sdk-node'
+import { ClerkExpressRequireAuth } from '@clerk/clerk-sdk-node'
 const app = express();
 
 app.use(express.json());
@@ -31,7 +31,7 @@ app.post("/api/v1/website", ClerkExpressRequireAuth(), async (req, res) => {
   });
 });
 
-app.get("/api/v1/website/status", async (req, res) => {
+app.get("/api/v1/website/status", ClerkExpressRequireAuth(), async (req, res) => {
   const websiteId = req.query.websiteId as string;
   const userId = req.userId!;
   const data = await prisma.website.findFirst({
@@ -47,7 +47,7 @@ app.get("/api/v1/website/status", async (req, res) => {
   res.json(data);
 });
 
-app.get("/api/v1/websites", async (req, res) => {
+app.get("/api/v1/websites", ClerkExpressRequireAuth(), async (req, res) => {
   const userId = req.userId!;
   const websites = await prisma.website.findMany({
     where: {
@@ -62,7 +62,7 @@ app.get("/api/v1/websites", async (req, res) => {
   res.json({ websites });
 });
 
-app.delete("/api/v1/website", async (req, res) => {
+app.delete("/api/v1/website", ClerkExpressRequireAuth(), async (req, res) => {
   const websiteId = req.query.websiteId as string;
   const userId = req.userId!;
   const data = await prisma.website.update({

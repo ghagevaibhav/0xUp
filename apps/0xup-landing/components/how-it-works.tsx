@@ -71,17 +71,17 @@ export default function HowItWorks() {
               Our decentralized network ensures reliable monitoring through distributed consensus.
             </p>
           </div>
-          <div className="bg-muted p-8 flex justify-center">
-          <div className="relative w-full aspect-video max-w-4xl mx-auto bg-gray-50">
-  <Image
-    src="/image.png"
-    alt="System Architecture"
-    fill
-    className="object-contain"  // Ensures full visibility
-    priority
-  />
-</div>
-</div>
+          <div className="bg-muted p-0 flex justify-center"> {/* Remove padding */}
+            <div className="relative w-full aspect-video max-w-full mx-auto h-128"> {/* Set a height for the container */}
+              <Image
+                src="/image.png"
+                alt="System Architecture"
+                fill
+                className="object-cover"  // Ensure the image covers the container
+                priority
+              />
+            </div>
+          </div>
         </div>
       </div>
     </section>

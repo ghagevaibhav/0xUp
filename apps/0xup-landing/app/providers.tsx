@@ -7,7 +7,7 @@ import type { ReactNode } from "react"
 export function Providers({ children }: { children: ReactNode }) {
   return (
     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-      <WebsitesProvider pollInterval={5000}>{children}</WebsitesProvider>
+      <WebsitesProvider>{children}</WebsitesProvider>
     </ThemeProvider>
   )
 }
