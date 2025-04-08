@@ -20,10 +20,11 @@ model User {
 
 model Website {
   id       String        @id @default(uuid())
-  url      String        @unique
+  url      String        
   userId   String
   ticks    WebsiteTick[]
   disabled Boolean       @default(false)
+  @@unique([url, userId])
 }
 
 model Validator {

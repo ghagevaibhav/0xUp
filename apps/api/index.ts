@@ -1,20 +1,27 @@
 import 'dotenv/config' 
-import express, { type Request, type Response } from "express";
+import express, { type Request, type Response, type NextFunction } from "express";
 import { prisma } from "db/client";
-import { authMiddleware } from "./middleware";
 import cors from "cors";
-import { ClerkExpressRequireAuth } from '@clerk/clerk-sdk-node'
+import { authMiddleware } from './middleware';
 const app = express();
 
 app.use(express.json());
 app.use(cors());
-app.use(authMiddleware);
+
+// Extend the Request interface to include userId
+declare global {
+  namespace Express {
+    interface Request {
+      userId?: string;
+    }
+  }
+}
 
 interface Error {
     stack: string;
 }
 
-app.post("/api/v1/website", ClerkExpressRequireAuth(), async (req, res) => {
+app.post("/api/v1/website", authMiddleware(), async (req, res) => {
   const userId = req.userId!;
   const { url } = req.body;
 
@@ -31,7 +38,7 @@ app.post("/api/v1/website", ClerkExpressRequireAuth(), async (req, res) => {
   });
 });
 
-app.get("/api/v1/website/status", ClerkExpressRequireAuth(), async (req, res) => {
+app.get("/api/v1/website/status", authMiddleware(), async (req, res) => {
   const websiteId = req.query.websiteId as string;
   const userId = req.userId!;
   const data = await prisma.website.findFirst({
@@ -47,7 +54,7 @@ app.get("/api/v1/website/status", ClerkExpressRequireAuth(), async (req, res) =>
   res.json(data);
 });
 
-app.get("/api/v1/websites", ClerkExpressRequireAuth(), async (req, res) => {
+app.get("/api/v1/websites", authMiddleware(), async (req, res) => {
   const userId = req.userId!;
   const websites = await prisma.website.findMany({
     where: {
@@ -62,7 +69,7 @@ app.get("/api/v1/websites", ClerkExpressRequireAuth(), async (req, res) => {
   res.json({ websites });
 });
 
-app.delete("/api/v1/website", ClerkExpressRequireAuth(), async (req, res) => {
+app.delete("/api/v1/website", authMiddleware(), async (req, res) => {
   const websiteId = req.query.websiteId as string;
   const userId = req.userId!;
   const data = await prisma.website.update({
@@ -79,9 +86,9 @@ app.delete("/api/v1/website", ClerkExpressRequireAuth(), async (req, res) => {
 });
 
 app.use((err: Error, req: Request, res: Response) => {
-    console.error(err.stack)
-    res.status(401).send('Unauthenticated!')
-  })
+    console.error(err.stack);
+    res.status(401).send('Unauthenticated!');
+});
 
 app.listen(8080, () => {
   console.log("Server started on port 8080");
