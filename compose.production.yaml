@@ -1,0 +1,88 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Production Settings
+  postgres:
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+      POSTGRES_USER_FILE: /run/secrets/postgres_user
+    secrets:
+      - postgres_password
+      - postgres_user
+
+  # API Production Settings
+  api:
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+    environment:
+      DATABASE_URL_FILE: /run/secrets/database_url
+      CLERK_SECRET_KEY_FILE: /run/secrets/clerk_secret_key
+    secrets:
+      - database_url
+      - clerk_secret_key
+
+  # Frontend Production Settings
+  frontend:
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+    environment:
+      NEXT_PUBLIC_API_URL: https://api.yourdomain.com
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY_FILE: /run/secrets/clerk_publishable_key
+      CLERK_SECRET_KEY_FILE: /run/secrets/clerk_secret_key
+    secrets:
+      - clerk_publishable_key
+      - clerk_secret_key
+
+  # Hub Production Settings
+  hub:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+    environment:
+      DATABASE_URL_FILE: /run/secrets/database_url
+    secrets:
+      - database_url
+
+  # Validator Production Settings
+  validator:
+    deploy:
+      replicas: 3
+      resources:
+        limits:
+          cpus: '0.3'
+          memory: 256M
+
+  # Nginx Production Settings
+  nginx:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+
+secrets:
+  postgres_password:
+    external: true
+  postgres_user:
+    external: true
+  database_url:
+    external: true
+  clerk_secret_key:
+    external: true
+  clerk_publishable_key:
+    external: true 
