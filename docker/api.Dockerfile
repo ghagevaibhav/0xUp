@@ -27,8 +27,8 @@ COPY --from=builder /app/packages/db ./packages/db
 COPY --from=builder /app/package.json ./package.json
 
 # Set up health check
-HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:3001/api/health || exit 1
+# HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
+#   CMD curl -f http://localhost:3001/api/health || exit 1
 
 # Expose API port
 EXPOSE 3001

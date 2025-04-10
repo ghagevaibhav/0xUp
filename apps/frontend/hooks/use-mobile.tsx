@@ -1,5 +1,4 @@
 import * as React from "react";
-import { prisma } from 'db/client'
 
 const MOBILE_BREAKPOINT = 768
 

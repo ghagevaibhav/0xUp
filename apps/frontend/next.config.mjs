@@ -23,6 +23,7 @@ const nextConfig = {
     parallelServerCompiles: true,
   },
   reactStrictMode: true,
+  output: "standalone",
 }
 
 mergeConfig(nextConfig, userConfig)

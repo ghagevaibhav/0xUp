@@ -3,7 +3,7 @@ import type { Tick } from "@/types/website"
 export function calculateUptimePercentage(ticks: Tick[]): number {
   if (ticks.length === 0) return 100
 
-  const upTicks = ticks.filter((tick) => tick.status === "up").length
+  const upTicks = ticks.filter((tick) => tick.status === "Up").length
   return (upTicks / ticks.length) * 100
 }
 
@@ -49,7 +49,7 @@ export function aggregateTicksInWindows(ticks: Tick[], windowMinutes: number): T
   // Aggregate each window
   return Object.entries(windows)
     .map(([windowKey, windowTicks]) => {
-      const upTicks = windowTicks.filter((t) => t.status === "up").length
+      const upTicks = windowTicks.filter((t) => t.status === "Up").length
       const downTicks = windowTicks.length - upTicks
       const avgLatency = windowTicks.reduce((sum, t) => sum + (t.latency || 0), 0) / windowTicks.length
 
@@ -57,8 +57,8 @@ export function aggregateTicksInWindows(ticks: Tick[], windowMinutes: number): T
         id: windowKey,
         websiteId: windowTicks[0].websiteId,
         validatorId: windowTicks[0].validatorId,
-        createdAt: windowKey,
-        status: upTicks > downTicks ? "up" : "down",
+        createdAt: new Date(windowKey),
+        status: upTicks > downTicks ? ("Up" as const) : ("Down" as const),
         latency: Math.round(avgLatency),
       }
     })

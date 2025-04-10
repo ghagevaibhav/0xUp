@@ -45,6 +45,7 @@
     "clsx": "^2.1.1",
     "cmdk": "1.0.4",
     "date-fns": "latest",
+    "db": "*",
     "embla-carousel-react": "8.5.1",
     "input-otp": "1.4.1",
     "lucide-react": "^0.454.0",
@@ -53,15 +54,14 @@
     "react": "^19",
     "react-day-picker": "8.10.1",
     "react-dom": "^19",
-    "react-hook-form": "latest",
+    "react-hook-form": "^7.55.0",
     "react-resizable-panels": "^2.1.7",
     "recharts": "2.15.0",
     "sonner": "^1.7.1",
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^0.9.6",
-    "zod": "latest",
-    "db": "*"
+    "zod": "latest"
   },
   "devDependencies": {
     "@types/node": "^22",

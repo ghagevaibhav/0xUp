@@ -1,0 +1,31 @@
+
+FROM node:20-alpine
+
+WORKDIR /app
+
+RUN echo "Build context files:" && ls -la
+
+COPY package.json ./
+RUN echo "Root package.json copied" && ls -la
+
+RUN mkdir -p apps/api packages/db packages/common
+RUN echo "Directories created" && ls -la
+
+COPY apps/api/package.json ./apps/api/
+RUN echo "API package.json copied" && ls -la ./apps/api/
+
+COPY packages/db/package.json ./packages/db/
+RUN echo "DB package.json copied" && ls -la ./packages/db/
+
+COPY packages/common/package.json ./packages/common/
+RUN echo "Common package.json copied" && ls -la ./packages/common/
+
+RUN npm install
+
+COPY . .
+
+WORKDIR /app/apps/api
+
+EXPOSE 8080
+
+CMD ["bun", "run", "start"]

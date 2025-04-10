@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage, useFormField } from "@/components/ui/form"
 import { PlusCircle } from "lucide-react"
 
 // Form schema
@@ -68,7 +68,7 @@ export function AddWebsiteModal({ onAdd, isOpen, onOpenChange }: AddWebsiteModal
             <FormField
               control={form.control}
               name="name"
-              render={({ field }) => (
+              render={({ field }: { field: any }) => (
                 <FormItem>
                   <FormLabel>Website Name</FormLabel>
                   <FormControl>
@@ -83,7 +83,7 @@ export function AddWebsiteModal({ onAdd, isOpen, onOpenChange }: AddWebsiteModal
             <FormField
               control={form.control}
               name="url"
-              render={({ field }) => (
+              render={({ field }: { field: any }) => (
                 <FormItem>
                   <FormLabel>URL</FormLabel>
                   <FormControl>

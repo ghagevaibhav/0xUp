@@ -17,9 +17,16 @@ declare global {
   }
 }
 
+
 interface Error {
-    stack: string;
+  stack: string;
 }
+
+
+app.get('/', (req, res) => {
+  res.json({ message: 'Hello there' });
+})
+
 
 app.post("/api/v1/website", authMiddleware(), async (req, res) => {
   const userId = req.userId!;
@@ -85,9 +92,9 @@ app.delete("/api/v1/website", authMiddleware(), async (req, res) => {
   res.json(data);
 });
 
-app.use((err: Error, req: Request, res: Response) => {
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
     console.error(err.stack);
-    res.status(401).send('Unauthenticated!');
+    res.json({ message: 'Unauthenticated!' });
 });
 
 app.listen(8080, () => {
