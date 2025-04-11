@@ -1,5 +1,3 @@
-import { Keypair } from "@solana/web3.js";
-import bs58 from "bs58";
 import type { IncomingMessage, SignupIncomingMessage } from "common";
 import { prisma } from "db/client";
 import { randomUUIDv7, type ServerWebSocket } from "bun";

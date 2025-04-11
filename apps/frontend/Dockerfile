@@ -1,75 +1,65 @@
-# FROM node:20-alpine as deps
-
-# WORKDIR /app
-
-# COPY package.json bun.lock ./
-# COPY apps/frontend/package.json ./app/frontend/
-
-# RUN npm install
-
-# FROM node:20-alpine as builder
-
-# COPY apps/frontend/ ./app/frontend         
-# COPY --from=deps /app/node_modules ./node_modules
-
-# WORKDIR /app/frontend
-
-# RUN npm run build
-
-# FROM node:20-alpine as runner
-# WORKDIR /app/frontend
-
-
-# EXPOSE 3000
-
-# ENV PORT 3000
-
-# CMD ["node", "./apps/frontend/.next/standalone/server.js"]
-
-
-
-# Stage 1: Install dependencies
+# stage 1: install dependencies
 FROM node:20-alpine AS deps
 WORKDIR /app
 
-# Copy package files first for better caching
+# copy package files for dependency installation
 COPY package.json bun.lock ./
-COPY apps/frontend/package.json ./apps/frontend/
+COPY apps/frontend/package.json ./frontend/
 
-# Use npm ci for production dependencies only (faster and more reliable than install)
-RUN npm install
+# install dependencies with legacy peer dependencies
+RUN npm install --legacy-peer-deps
 
-# Stage 2: Build the application
+# stage 2: build the application
 FROM node:20-alpine AS builder
 WORKDIR /app
 
-# Copy from deps stage
+# copy installed node_modules from deps stage
 COPY --from=deps /app/node_modules ./node_modules
 
-# Copy application files
-COPY . .
+# copy frontend source code
+COPY apps/frontend ./frontend
 
-WORKDIR /app/apps/frontend
+# copy typescript and next.js configuration files
+COPY apps/frontend/tsconfig.json ./tsconfig.json
+COPY apps/frontend/next.config.mjs ./next.config.mjs
 
-# Build the application
+WORKDIR /app/frontend
+
+# install dependencies again for the frontend
+RUN npm install --legacy-peer-deps
+
+# set environment to production
+ENV NODE_ENV=production
+# build the next.js application
 RUN npm run build
 
-# Stage 3: Production runtime
+# stage 3: run the application
 FROM node:20-alpine AS runner
 WORKDIR /app
 
-# Install production dependencies only (no need for devDependencies)
+# install serve globally to serve the built application
 RUN npm install -g serve
 
-# Copy built assets and dependencies
-COPY --from=builder /app/apps/frontend/public ./apps/frontend/public
-COPY --from=builder /app/apps/frontend/.next/standalone ./
-COPY --from=builder /app/apps/frontend/.next/static ./apps/frontend/.next/static
+# copy built files from builder stage
+COPY --from=builder /app/frontend/public ./public
+COPY --from=builder /app/frontend/.next/standalone ./
+COPY --from=builder /app/frontend/.next/static ./.next/static
+COPY --from=builder /app/frontend/package.json ./package.json
 
-# Set environment variables
-ENV NODE_ENV production
-ENV PORT 3000
+# set environment variables for production
+ENV NODE_ENV=production
+ENV PORT=3000
+ENV HOSTNAME=0.0.0.0
 
-# Expose and run
+# create a non-root user for security
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs && \
+    chown -R nextjs:nodejs /app
+
+# switch to non-root user
+USER nextjs
+
+# expose the application port
 EXPOSE 3000
-CMD ["node", "./apps/frontend/server.js"]
+# command to run the application
+CMD ["node", "server.js"]
