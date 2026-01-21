@@ -1,4 +1,4 @@
-FROM oven/bun:1.2.1 as base
+FROM oven/bun:1.2.21 AS base
 
 # Set working directory
 WORKDIR /app
@@ -8,12 +8,13 @@ FROM base as dependencies
 COPY package.json bun.lock ./
 COPY apps/api/package.json ./apps/api/
 COPY packages/db/package.json ./packages/db/
-RUN bun install --frozen-lockfile
+RUN bun install
 
 # Build the app
 FROM dependencies as builder
 COPY . .
-RUN bun run build
+# Generate Prisma client (no build needed for Bun TS)
+RUN cd packages/db && bunx prisma generate
 
 # Production image
 FROM base as runner

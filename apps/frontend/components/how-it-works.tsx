@@ -66,18 +66,18 @@ export default function HowItWorks() {
 
         <div className="mt-20 bg-card border rounded-lg overflow-hidden shadow-lg">
           <div className="p-2 md:p-8">
-            <h3 className="text-2xl font-bold mb-4">0xUp's System Architecture</h3>
+            <h3 className="text-2xl font-bold mb-4">0xUp&apos;s System Architecture</h3>
             <p className="text-muted-foreground mb-2">
               Our decentralized network ensures reliable monitoring through distributed consensus.
             </p>
           </div>
           <div className="bg-muted p-0 flex justify-center"> {/* Remove padding */}
-            <div className="relative w-full aspect-video max-w-full mx-auto h-128"> {/* Set a height for the container */}
+            <div className="relative w-full aspect-video max-w-full mx-auto h-[600px] object-contain "> {/* Set a height for the container */}
               <Image
                 src="/image.png"
                 alt="System Architecture"
                 fill
-                className="object-cover"  // Ensure the image covers the container
+                // className="object-cover"  // Ensure the image covers the container
                 priority
               />
             </div>

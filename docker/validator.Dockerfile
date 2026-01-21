@@ -1,4 +1,4 @@
-FROM oven/bun:1.2.1 as base
+FROM oven/bun:1.2.21 AS base
 
 # Set working directory
 WORKDIR /app
@@ -8,12 +8,12 @@ FROM base as dependencies
 COPY package.json bun.lock ./
 COPY apps/validator/package.json ./apps/validator/
 COPY packages/common/package.json ./packages/common/
-RUN bun install --frozen-lockfile
+RUN bun install
 
 # Build the app
 FROM dependencies as builder
 COPY . .
-RUN bun run build
+# No build step needed - Bun runs TS directly
 
 # Production image
 FROM base as runner

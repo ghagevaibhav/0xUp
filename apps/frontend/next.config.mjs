@@ -24,6 +24,7 @@ const nextConfig = {
   },
   reactStrictMode: true,
   output: "standalone",
+  outputFileTracingRoot: "/home/ghagevaibhav/VS Code/Projects/DePin/0xUp",
 }
 
 mergeConfig(nextConfig, userConfig)
